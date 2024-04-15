@@ -1,6 +1,6 @@
 Los Objetivos de este proyecto son:
 
-+ Objetivo 1: Crear un software de visualización de imágenes radiológicas, que contenga las herramientas necesarias para este fin.
++ Objetivo 1: Crear un software de visualización de imágenes médicas, que contenga las herramientas necesarias para este fin.
 
 + Objetivo 2: Proporcionar una herramienta de trabajo al cliente que le permita desarrollar y satisfacer sus necesidades laborales.
 
