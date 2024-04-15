@@ -1,2 +1,2 @@
 Aqui va el diagrama de contexto
-![Diagrama de Contexto](https://github.com/sebastianguerra/GRP-03-2024-PROYINF/assets/53586605/224c2444-e08e-47be-9088-967bbd8c64b9)
+![Diagrama de Contexto](<iframe width="768" height="432" src="https://miro.com/app/live-embed/uXjVKUfPRiI=/?moveToViewport=-969,-393,1780,888&embedId=929434572071" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>)
