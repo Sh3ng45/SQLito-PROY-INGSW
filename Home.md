@@ -7,3 +7,4 @@ Los Elementos Trabajados son los Siguientes:
 * [Actores Relevantes](Actores-Relevantes)
 * [Diagrama de Contexto](Diagrama-de-Contexto)
 * [Modelo de Dominio](Modelo-de-Dominio)
+* [Diagramas de Secuencia](Diagramas-de-Secuencia)
