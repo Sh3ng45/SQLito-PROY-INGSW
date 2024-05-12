@@ -6,4 +6,8 @@
 
 ![Diagrama sin título drawio (5)](https://github.com/sebastianguerra/GRP-03-2024-PROYINF/assets/163371085/2e90724e-6862-4ab7-82a4-055246d518b8)
 
+*Diagrama HU3:*
+
+
+
 
