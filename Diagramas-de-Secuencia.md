@@ -4,4 +4,4 @@
 
 *Diagrama HU2:*
 
-![Diagrama de Secuencia HU2 drawio](https://github.com/sebastianguerra/GRP-03-2024-PROYINF/assets/163371085/2d73ebf7-51db-42cc-bf72-e98e49978d9f)
+![Diagrama sin título drawio](https://github.com/sebastianguerra/GRP-03-2024-PROYINF/assets/163371085/a4d66272-13d2-49b5-b4ca-4b3fad267c05)
