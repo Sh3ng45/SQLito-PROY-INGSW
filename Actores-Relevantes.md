@@ -1,6 +1,6 @@
 Los "Actores Relevantes" para este proyecto creemos que son:
 
-* Julio Sotelo, Ingeniero encargado del área de al tecnología en la medicina y representante de la empresa a la cual debemos desarrollarle el Software.
+* Radiólogos, encargados de usar el software para llegar a las conclusiones medicas.
 
 * Enfermos Cardiacos, grupo objetivo que se vería beneficiado con los resultados e implementación de este Software.
 
