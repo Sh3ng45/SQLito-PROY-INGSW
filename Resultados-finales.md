@@ -14,5 +14,3 @@ Sin embargo, El éxito parcial de la aplicación es atribuido a que, a pesar de 
 
 ***
 
-**### ¿Por que?**
-
