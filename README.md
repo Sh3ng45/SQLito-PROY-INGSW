@@ -12,7 +12,7 @@ Este es el repositorio de *SQLito*, cuyos integrantes son:
 
 > Obtener enlace desde el home de la wiki del repo.
 
-Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/sebastianguerra/GRP-03-2024-PROYINF/wiki)
+Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/Sh3ng45/SQLito-PROY-INGSW/wiki)
 `
 
 ## Videos
