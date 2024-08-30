@@ -1,8 +1,8 @@
 # SQLito
 
-Este es el repositorio del *Grupo 03*, cuyos integrantes son:
+Este es el repositorio de *SQLito*, cuyos integrantes son:
 
-* 
+* Tomás Valenzuela - 
 * Nelson Sepúlveda - 202004610-7
 * Vicente Henríquez - 202051507-7
 * Francisco Domínguez - 202104520-1
