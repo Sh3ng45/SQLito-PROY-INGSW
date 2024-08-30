@@ -1,0 +1,9 @@
+{
+    "editor.tabSize": 2,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always"
+    },
+    "eslint.workingDirectories": [
+        { "directory": "./client", "changeProcessCWD": true },
+        { "directory": "./server", "changeProcessCWD": true }]
+}
