@@ -1,1 +1,0 @@
-![Modelo de Dominio](https://github.com/sebastianguerra/GRP-03-2024-PROYINF/assets/53586605/19c2795b-9cf8-4244-9153-52163ae7fc30)
