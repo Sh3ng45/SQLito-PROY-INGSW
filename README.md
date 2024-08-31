@@ -13,8 +13,6 @@ Nuestro proyecto consiste en un Visualizador de imagenes DICOM en las 3 direccio
 
 ## Wiki
 
-> Obtener enlace desde el home de la wiki del repo.
-
 Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/Sh3ng45/SQLito-PROY-INGSW/wiki)
 `
 
