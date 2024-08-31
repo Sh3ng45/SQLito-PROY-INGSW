@@ -1,4 +1,4 @@
-# SQLito
+## SQLito
 
 Este es el repositorio de *SQLito*, cuyos integrantes son:
 
@@ -7,6 +7,9 @@ Este es el repositorio de *SQLito*, cuyos integrantes son:
 * Vicente Henríquez - 202051507-7
 * Francisco Domínguez - 202104520-1
 * **Tutor**: Jose Southerland
+
+## Proyecto
+Nuestro proyecto consiste en un Visualizador de imagenes DICOM en las 3 direcciones ortogonales.
 
 ## Wiki
 
