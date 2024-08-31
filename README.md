@@ -11,6 +11,8 @@ Este es el repositorio de *SQLito*, cuyos integrantes son:
 ## Proyecto
 Nuestro proyecto consiste en un Visualizador de imagenes DICOM en las 3 direcciones ortogonales.
 
+Se planea que la continuación sea el punto (2) Mostrar información de la cabecera DICOM e incorporar un buscador.
+
 ## Wiki
 
 Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/Sh3ng45/SQLito-PROY-INGSW/wiki)
