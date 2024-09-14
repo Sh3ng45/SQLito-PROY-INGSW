@@ -7,15 +7,23 @@ interface PanelProps {
   style?: React.CSSProperties;
 }
 
+interface DicomHeaderInfo {
+  pacienteNombre: string;
+  fechaEstudio: string;
+  modalidad: string;
+  numeroSerie: string;
+  numeroInstancia: string;
+}
+
 const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
   { imageIds, style = {} },
   outerRef,
 ) {
   const panelRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   useImperativeHandle(outerRef, () => panelRef.current!, [panelRef]);
 
   const [panel, setPanel] = useState<HTMLDivElement | null>(null);
+  const [dicomHeaderInfo, setDicomHeaderInfo] = useState<DicomHeaderInfo | null>(null);
 
   useEffect(() => {
     setPanel(panelRef.current);
@@ -49,11 +57,24 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
     }
   }, [currentImageIndex, imageIds.length]);
 
+  const extractDicomHeaderInfo = (image: any): DicomHeaderInfo => {
+    const { data } = image;
+    return {
+      pacienteNombre: data.string('x00100010') || 'N/A',
+      fechaEstudio: data.string('x00080020') || 'N/A',
+      modalidad: data.string('x00080060') || 'N/A',
+      numeroSerie: data.string('x00200011') || 'N/A',
+      numeroInstancia: data.string('x00200013') || 'N/A',
+    };
+  };
+
   useEffect(() => {
     void (async () => {
       if (panel && imageIds.length && imageIds[currentImageIndex]) {
         const image = await cornerstone.loadImage(imageIds[currentImageIndex]);
         cornerstone.displayImage(panel, image);
+        const headerInfo = extractDicomHeaderInfo(image);
+        setDicomHeaderInfo(headerInfo);
       }
     })();
   }, [panel, imageIds, currentImageIndex]);
@@ -78,7 +99,29 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
     };
   }, [panel, handleScroll]);
 
-  return <div ref={panelRef} style={style} />;
+  return (
+    <div style={{ ...style, display: 'flex', flexDirection: 'column' }}>
+      <div ref={panelRef} style={{ flex: 1 }} />
+      {dicomHeaderInfo && (
+        <div style={{ 
+          backgroundColor: 'rgba(0, 0, 0, 0.7)', 
+          color: 'white', 
+          padding: '5px', 
+          fontSize: '12px',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+        }}>
+          <div>Paciente: {dicomHeaderInfo.pacienteNombre}</div>
+          <div>Fecha: {dicomHeaderInfo.fechaEstudio}</div>
+          <div>Modalidad: {dicomHeaderInfo.modalidad}</div>
+          <div>Series: {dicomHeaderInfo.numeroSerie}</div>
+          <div>Instancia: {dicomHeaderInfo.numeroInstancia}</div>
+        </div>
+      )}
+    </div>
+  );
 });
 
 export default Panel;
