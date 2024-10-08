@@ -25,10 +25,14 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
   const [panel, setPanel] = useState<HTMLDivElement | null>(null);
   const [dicomHeaderInfo, setDicomHeaderInfo] = useState<DicomHeaderInfo | null>(null);
 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);  // Estado para controlar el índice actual de la imagen
+
+  // Setea el panel una vez que el panelRef está disponible
   useEffect(() => {
     setPanel(panelRef.current);
   }, [panelRef]);
 
+  // Habilita Cornerstone en el panel y limpia al desmontar
   useEffect(() => {
     if (panel) {
       console.log('enable');
@@ -39,24 +43,24 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
     };
   }, [panel]);
 
+  // Ajusta Cornerstone cuando el tamaño de la ventana cambia
   const [windowX, windowY] = useWindowSize();
-
   useEffect(() => {
     if (panel) {
       cornerstone.resize(panel);
     }
   }, [panel, windowX, windowY, panel?.clientWidth, panel?.clientHeight]);
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+  // Asegura que el índice de la imagen esté dentro de los límites
   useEffect(() => {
     if (currentImageIndex >= imageIds.length) {
-      setCurrentImageIndex(imageIds.length);
+      setCurrentImageIndex(imageIds.length - 1);
     } else if (currentImageIndex < 0) {
       setCurrentImageIndex(0);
     }
   }, [currentImageIndex, imageIds.length]);
 
+  // Extrae la información del encabezado DICOM
   const extractDicomHeaderInfo = (image: any): DicomHeaderInfo => {
     const { data } = image;
     return {
@@ -68,6 +72,7 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
     };
   };
 
+  // Carga y muestra la imagen actual, actualiza el encabezado DICOM
   useEffect(() => {
     void (async () => {
       if (panel && imageIds.length && imageIds[currentImageIndex]) {
@@ -79,15 +84,17 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
     })();
   }, [panel, imageIds, currentImageIndex]);
 
+  // Manejador para desplazarse entre imágenes usando la rueda del mouse
   const handleScroll = useCallback((event: WheelEvent) => {
     event.preventDefault();
     if (event.deltaY > 0) {
-      setCurrentImageIndex((prev) => prev + 1);
+      setCurrentImageIndex((prev) => Math.min(prev + 1, imageIds.length - 1));  // Avanza solo si no llega al final
     } else {
-      setCurrentImageIndex((prev) => prev - 1);
+      setCurrentImageIndex((prev) => Math.max(prev - 1, 0));  // Retrocede solo si no está en el inicio
     }
-  }, []);
+  }, [imageIds.length]);
 
+  // Añadir o remover el evento de scroll cuando el panel cambia
   useEffect(() => {
     if (panel) {
       panel.addEventListener('wheel', handleScroll);
@@ -100,8 +107,8 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
   }, [panel, handleScroll]);
 
   return (
-    <div style={{ ...style, display: 'flex', flexDirection: 'column' }}>
-      <div ref={panelRef} style={{ flex: 1 }} />
+    <div style={{ ...style, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <div ref={panelRef} style={{ flex: 1 }} /> {/* Contenedor de la imagen */}
       {dicomHeaderInfo && (
         <div style={{ 
           backgroundColor: 'rgba(0, 0, 0, 0.7)', 
@@ -113,6 +120,7 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
           left: 0,
           right: 0,
         }}>
+          {/* Mostrar información del encabezado DICOM */}
           <div>Paciente: {dicomHeaderInfo.pacienteNombre}</div>
           <div>Fecha: {dicomHeaderInfo.fechaEstudio}</div>
           <div>Modalidad: {dicomHeaderInfo.modalidad}</div>

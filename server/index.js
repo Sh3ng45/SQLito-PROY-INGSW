@@ -1,10 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import multer from 'multer'; // Importamos multer para manejar la subida de archivos
+import dicomParser from 'dicom-parser'; // Importamos dicom-parser para verificar si el archivo es DICOM
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
-
 import { createUser, findUser, verifyUser } from './database.js';
 
 const SECRET_KEY = 'secret';
@@ -34,6 +35,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const port = process.env.PORT ?? 3000;
+
+// Configuramos multer para manejar la subida de archivos
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 app.get('/', (req, res) => {
   res.send('Hello world');
@@ -90,6 +95,22 @@ app.get('/me', passport.authenticate('jwt', { session: false }), (req, res) => {
   res.json(req.user);
 });
 
+// Nuevo endpoint para subir imágenes y verificar si es DICOM
+app.post('/upload', upload.single('image'), (req, res) => {
+  try {
+    const fileBuffer = req.file.buffer;
+    const dataSet = dicomParser.parseDicom(fileBuffer);
+
+    if (dataSet) {
+      res.json({ message: 'El archivo es un DICOM válido' });
+    } else {
+      res.status(400).json({ message: 'El archivo no es un DICOM válido' });
+    }
+  } catch (error) {
+    res.status(400).json({ message: 'Error al analizar el archivo, puede que no sea DICOM' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
-})
+});
