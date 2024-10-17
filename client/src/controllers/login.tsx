@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@models/authContext/authContext';
+import '../styles/login_styles.css';
 
 const Viewer = () => {
   const { login, register } = useAuth();
@@ -18,7 +19,7 @@ const Viewer = () => {
   };
 
   return (
-    <div>
+    <div className="login-container">
       <h1>Visor DICOM</h1>
       <input
         type="text"

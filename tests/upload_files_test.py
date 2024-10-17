@@ -14,9 +14,9 @@ class TestCargaArchivosDICOM(unittest.TestCase):
             "../../DATOS_DICOM/Gd-MRA/IMG-0001-00001.dcm",
             "../../DATOS_DICOM/Gd-MRA/IMG-0001-00002.dcm",
             "../../DATOS_DICOM/Gd-MRA/IMG-0001-00003.dcm",
-            "../../DATOS_DICOM/Covid_Scans/Subject/98.12.2/56364397.dcm",
-            "../../DATOS_DICOM/Covid_Scans/Subject/98.12.2/56364398.dcm",
-            "../../DATOS_DICOM/Covid_Scans/Subject/98.12.2/56364402.dcm",
+            "../../DATOS_DICOM/Covid_Scans/Subject/98.12.2/56364397.dcm", # Caso Frontera
+            "../../DATOS_DICOM/Covid_Scans/Subject/98.12.2/56364398.dcm", # Caso Frontera
+            "../../DATOS_DICOM/Covid_Scans/Subject/98.12.2/56364402.dcm", # Caso Frontera
         ]  # Lista de rutas a diferentes archivos DICOM válidos
         cls.archivos_no_validos = [
             "../../Hito_3_vf.pdf",

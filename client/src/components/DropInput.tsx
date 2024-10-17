@@ -1,4 +1,5 @@
 import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
+import styles from '../styles/DropInput.module.css';
 
 interface DropInputProps extends PropsWithChildren {
   onDragOverColor?: string;
@@ -61,7 +62,8 @@ const DropInput: React.FC<DropInputProps> = (props) => {
   return (
     <div
       ref={elementRef}
-      style={{ borderWidth: '3px', borderStyle: 'solid', ...style, borderColor }}
+      className={styles.dropInput}
+      style={{ borderColor, ...style }}
     >
       {children}
     </div>

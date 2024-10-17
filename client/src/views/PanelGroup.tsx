@@ -10,6 +10,7 @@ import DropInput from '../components/DropInput';
 import Panel from './Panel';
 import axios from 'axios'; // Agregamos axios para hacer la solicitud al servidor
 
+
 interface PanelGroupProps {
   columns: number;
   rows: number;

@@ -20,10 +20,10 @@ class TestLoginAPI(unittest.TestCase):
             {"username": "admin", "password": "wrong_password"},
             {"username": "wrong_user", "password": "admin"},
             {"username": "user2", "password": "1234"},
-            {"username": "r", "password": "u"},
+            {"username": "r", "password": "u"}, # Caso frontera
+            {"username": "admin", "password": "admin123"}
         ]
             
-
     def test_login_exitoso_devuelve_token(self):
         """
         Caso de prueba: Verificar que el login exitoso devuelve un token.

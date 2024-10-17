@@ -1,0 +1,56 @@
+/* Estilos exclusivos para el visor */
+.viewer-container {
+  padding: 10px;
+  background-color: #1c1e21; /* Fondo gris oscuro */
+  height: 100%;
+  width: 100%;
+}
+
+.viewer-toolbar {
+  display: flex;
+  justify-content: space-between; /* Coloca elementos a los extremos */
+  align-items: center;
+  background-color: #2d2f33; /* Fondo gris oscuro */
+  padding: 10px;
+}
+
+.viewer-controls-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.viewer-controls {
+  display: flex;
+  align-items: center;
+  margin-right: 20px; /* Espacio entre controles */
+}
+
+.viewer-controls span {
+  color: #d3d3d3; /* Gris claro */
+}
+
+.viewer-controls input {
+  width: 40px;
+  margin: 0 5px;
+  text-align: center;
+  background-color: #333741;
+  border: 1px solid #d3d3d3;
+  color: #d3d3d3;
+}
+
+.viewer-controls input:hover {
+  background-color: #2d2f33;
+}
+
+.logout-button {
+  background-color: #3a77ff;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 5px 10px;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #295fcc;
+}
