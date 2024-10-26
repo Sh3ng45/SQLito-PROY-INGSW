@@ -8,8 +8,7 @@ import dicomParser from 'dicom-parser';
 import cornerstoneWADOImageLoader from 'cornerstone-wado-image-loader';
 import DropInput from '../components/DropInput';
 import Panel from './Panel';
-import axios from 'axios'; // Agregamos axios para hacer la solicitud al servidor
-
+import axios from 'axios';
 
 interface PanelGroupProps {
   columns: number;
@@ -22,7 +21,7 @@ const PanelGroup: React.FC<PanelGroupProps> = ({ columns, rows }) => {
     cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
   }, []);
 
-  const [selectedImageSet, setSelectedImageSet] = React.useState<number | null>(null);
+  const [selectedImageSets, setSelectedImageSets] = React.useState<number[]>(Array(columns * rows).fill(null));
   const [imgSets, setImgSets] = React.useState<string[][]>([]);
   const [imgs, setImgs] = React.useState<
     Record<number, { imageId: string; instanceNumber: number; patientName: string; seriesDescription: string; modality: string; studyDate: string }[]>
@@ -33,7 +32,6 @@ const PanelGroup: React.FC<PanelGroupProps> = ({ columns, rows }) => {
       const arrayBuffer = await file.arrayBuffer();
       const dataSet = dicomParser.parseDicom(new Uint8Array(arrayBuffer));
 
-      // Extraer información DICOM
       const patientName = dataSet.string('x00100010') || 'Desconocido';
       const seriesDescription = dataSet.string('x0008103e') || 'No especificado';
       const modality = dataSet.string('x00080060') || 'No especificado';
@@ -76,11 +74,19 @@ const PanelGroup: React.FC<PanelGroupProps> = ({ columns, rows }) => {
               }]
         };
 
-        console.log("Imágenes actualizadas:", updatedImgs); // Log para verificar el contenido cargado
+        console.log("Imágenes actualizadas:", updatedImgs);
         return updatedImgs;
       });
 
-      setSelectedImageSet(imgSet);
+      setSelectedImageSets(prev => {
+        const newSelectedImageSets = [...prev];
+        // Encuentra el primer panel sin un set de imágenes asignado
+        const firstEmptyPanelIndex = newSelectedImageSets.findIndex(set => set === null);
+        if (firstEmptyPanelIndex !== -1) {
+          newSelectedImageSets[firstEmptyPanelIndex] = imgSet;
+        }
+        return newSelectedImageSets;
+      });
 
       // Enviar la imagen al servidor
       const formData = new FormData();
@@ -100,37 +106,8 @@ const PanelGroup: React.FC<PanelGroupProps> = ({ columns, rows }) => {
   };
 
   return (
-    <div
-      style={{
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <Select
-          value={selectedImageSet ? { value: selectedImageSet, label: selectedImageSet.toString() } : null}
-          styles={{
-            container: (provided) => ({
-              ...provided,
-              width: '80%',
-            }),
-          }}
-          options={Object.keys(imgSets)
-            .filter((key) => imgs[parseInt(key, 10)]?.length > 0)  // Asegurarnos de que haya imágenes cargadas
-            .flatMap((key) =>
-              imgs[parseInt(key, 10)].map((img) => ({
-                value: parseInt(key, 10),
-                label: `Paciente: ${img.patientName}, Serie: ${img.seriesDescription}, Modalidad: ${img.modality}, Fecha: ${img.studyDate}`,
-              }))
-            )}
-          onChange={(selected) => {
-            setSelectedImageSet(selected?.value ?? null);
-          }}
-          getOptionLabel={(option) => option.label}
-          getOptionValue={(option) => option.value}
-        />
         <input
           type="file"
           multiple
@@ -149,29 +126,36 @@ const PanelGroup: React.FC<PanelGroupProps> = ({ columns, rows }) => {
           flexDirection: 'row',
         }}
       >
-        <div
-          style={{
-            display: 'grid',
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'black',
-            gridTemplateColumns: `repeat(${columns.toString()}, 1fr)`,
-            gridTemplateRows: `repeat(${rows.toString()}, 1fr)`,
-          }}
-        >
+        <div style={{ display: 'grid', width: '100%', height: '100%', backgroundColor: 'black', gridTemplateColumns: `repeat(${columns.toString()}, 1fr)`, gridTemplateRows: `repeat(${rows.toString()}, 1fr)` }}>
           {Array.from({ length: columns * rows }).map((_, i) => (
-            <Panel
-              key={i}
-              imageIds={selectedImageSet ? imgs[selectedImageSet].map((img) => img.imageId) : []}
-              style={{
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'darkgray',
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                borderRadius: '5px',
-              }}
-            />
+            <div key={i} style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <Select
+                value={selectedImageSets[i] ? { value: selectedImageSets[i], label: selectedImageSets[i].toString() } : null}
+                styles={{ container: (provided) => ({ ...provided, width: '100%', margin: 0, padding: 0 }) }}
+                options={Object.keys(imgSets)
+                  .filter((key) => imgs[parseInt(key, 10)]?.length > 0)
+                  .flatMap((key) =>
+                    imgs[parseInt(key, 10)].map((img) => ({
+                      value: parseInt(key, 10),
+                      label: `Paciente: ${img.patientName}, Serie: ${img.seriesDescription}, Modalidad: ${img.modality}, Fecha: ${img.studyDate}`,
+                    }))
+                  )}
+                onChange={(selected) => {
+                  setSelectedImageSets((prev) => {
+                    const newSelectedSets = [...prev];
+                    newSelectedSets[i] = selected?.value ?? null;
+                    return newSelectedSets;
+                  });
+                }}
+                getOptionLabel={(option) => option.label}
+                getOptionValue={(option) => option.value}
+              />
+              <Panel
+                key={i}
+                imageIds={selectedImageSets[i] ? imgs[selectedImageSets[i]].map((img) => img.imageId) : []}
+                style={{ width: '100%', height: '100%', backgroundColor: 'darkgray', borderWidth: '1px', borderStyle: 'solid', borderRadius: '5px' }}
+              />
+            </div>
           ))}
         </div>
       </DropInput>
