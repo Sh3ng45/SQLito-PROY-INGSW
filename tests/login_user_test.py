@@ -7,7 +7,7 @@ class TestLoginAPI(unittest.TestCase):
     def setUpClass(cls):
         # URL base para las pruebas de autenticación
         cls.base_url = "http://localhost:3000/login"
-        # Datos de usuario para el login (pueden ser enviados en JSON)
+        # Datos de usuario para el login (Formato JSON)
         cls.headers = {"Content-Type": "application/json"}
         cls.user_valid_data = [
             {"username": "vicho", "password": "1234"},
@@ -49,7 +49,7 @@ class TestLoginAPI(unittest.TestCase):
                 self.assertIsNotNone(token)
                 self.assertNotEqual(token, "", "El token no debería estar vacío.")
 
-                # (Opcional) Verificar si el token tiene el formato típico de un JWT
+                # Verificar si el token tiene el formato típico de un JWT
                 self.assertTrue(token.count('.') == 2, "El token no parece ser un JWT válido")
 
     def test_login_fallido_no_devuelve_token(self):
@@ -73,7 +73,7 @@ class TestLoginAPI(unittest.TestCase):
                     # Verificar que el cuerpo de la respuesta no contiene el token
                     self.assertNotIn('token', response_json, "No se debería devolver un token para un login fallido.")
 
-                    # Opcional: Verificar el mensaje de error
+                    # Verificar el mensaje de error
                     expected_error_message = "Invalid username or password"
                     self.assertEqual(response_json.get('error'), expected_error_message, "Mensaje de error incorrecto.")
                 else:

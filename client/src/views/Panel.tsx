@@ -9,10 +9,48 @@ interface PanelProps {
 
 interface DicomHeaderInfo {
   pacienteNombre: string;
+  medicoNombre: string;
+  hospitalEstudio: string;
   fechaEstudio: string;
   modalidad: string;
-  numeroSerie: string;
   numeroInstancia: string;
+  orientacionImagen: string;
+}
+
+function formatDicomDate(dicomDate: string): string {
+  const year = dicomDate.substring(0, 4);
+  const month = dicomDate.substring(4, 6);
+  const day = dicomDate.substring(6, 8);
+  return `${day}/${month}/${year}`;
+}
+
+function getImageOrientation(dicomOrientation: string): string {
+  const values = dicomOrientation.split('\\').map(parseFloat);
+  const xDirection = [values[0], values[1], values[2]];
+  const yDirection = [values[3], values[4], values[5]];
+
+  if (
+    xDirection[0] === 1 && xDirection[1] === 0 && xDirection[2] === 0 &&
+    yDirection[0] === 0 && yDirection[1] === 1 && yDirection[2] === 0
+  ) {
+    return "Axial";
+  }
+
+  if (
+    xDirection[0] === 1 && xDirection[1] === 0 && xDirection[2] === 0 &&
+    (yDirection[0] === 0 && yDirection[1] === 0 && Math.abs(yDirection[2]) === 1)
+  ) {
+    return "Coronal";
+  }
+
+  if (
+    xDirection[0] === 0 && xDirection[1] === 1 && xDirection[2] === 0 &&
+    (yDirection[0] === 0 && yDirection[1] === 0 && Math.abs(yDirection[2]) === 1)
+  ) {
+    return "Sagital";
+  }
+
+  return "Orientación desconocida";
 }
 
 const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
@@ -25,14 +63,12 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
   const [panel, setPanel] = useState<HTMLDivElement | null>(null);
   const [dicomHeaderInfo, setDicomHeaderInfo] = useState<DicomHeaderInfo | null>(null);
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);  // Estado para controlar el índice actual de la imagen
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Setea el panel una vez que el panelRef está disponible
   useEffect(() => {
     setPanel(panelRef.current);
   }, [panelRef]);
 
-  // Habilita Cornerstone en el panel y limpia al desmontar
   useEffect(() => {
     if (panel) {
       console.log('enable');
@@ -43,7 +79,6 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
     };
   }, [panel]);
 
-  // Ajusta Cornerstone cuando el tamaño de la ventana cambia
   const [windowX, windowY] = useWindowSize();
   useEffect(() => {
     if (panel) {
@@ -51,7 +86,6 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
     }
   }, [panel, windowX, windowY, panel?.clientWidth, panel?.clientHeight]);
 
-  // Asegura que el índice de la imagen esté dentro de los límites
   useEffect(() => {
     if (currentImageIndex >= imageIds.length) {
       setCurrentImageIndex(imageIds.length - 1);
@@ -60,19 +94,19 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
     }
   }, [currentImageIndex, imageIds.length]);
 
-  // Extrae la información del encabezado DICOM
   const extractDicomHeaderInfo = (image: any): DicomHeaderInfo => {
     const { data } = image;
     return {
       pacienteNombre: data.string('x00100010') || 'N/A',
+      medicoNombre: data.string('x00080090') || data.string('x00081050') || data.string('x00081060') || data.string('x00081090') || 'N/A',
+      hospitalEstudio: data.string('x00080080') || 'N/A',
       fechaEstudio: data.string('x00080020') || 'N/A',
       modalidad: data.string('x00080060') || 'N/A',
-      numeroSerie: data.string('x00200011') || 'N/A',
       numeroInstancia: data.string('x00200013') || 'N/A',
+      orientacionImagen: data.string('x00200037') || 'N/A',
     };
   };
 
-  // Carga y muestra la imagen actual, actualiza el encabezado DICOM
   useEffect(() => {
     void (async () => {
       if (panel && imageIds.length && imageIds[currentImageIndex]) {
@@ -84,17 +118,16 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
     })();
   }, [panel, imageIds, currentImageIndex]);
 
-  // Manejador para desplazarse entre imágenes usando la rueda del mouse
   const handleScroll = useCallback((event: WheelEvent) => {
     event.preventDefault();
+    event.stopPropagation();
     if (event.deltaY > 0) {
-      setCurrentImageIndex((prev) => Math.min(prev + 1, imageIds.length - 1));  // Avanza solo si no llega al final
+      setCurrentImageIndex((prev) => Math.min(prev + 1, imageIds.length - 1));
     } else {
-      setCurrentImageIndex((prev) => Math.max(prev - 1, 0));  // Retrocede solo si no está en el inicio
+      setCurrentImageIndex((prev) => Math.max(prev - 1, 0));
     }
   }, [imageIds.length]);
 
-  // Añadir o remover el evento de scroll cuando el panel cambia
   useEffect(() => {
     if (panel) {
       panel.addEventListener('wheel', handleScroll);
@@ -108,23 +141,24 @@ const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
 
   return (
     <div style={{ ...style, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-      <div ref={panelRef} style={{ flex: 1 }} /> {/* Contenedor de la imagen */}
+      <div ref={panelRef} style={{ flex: 1 }} />
       {dicomHeaderInfo && (
-        <div style={{ 
-          backgroundColor: 'rgba(0, 0, 0, 0.7)', 
-          color: 'white', 
-          padding: '5px', 
+        <div style={{
+          backgroundColor: 'rgba(0, 0, 0, 0)',
+          color: 'white',
+          padding: '5px',
           fontSize: '12px',
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
         }}>
-          {/* Mostrar información del encabezado DICOM */}
           <div>Paciente: {dicomHeaderInfo.pacienteNombre}</div>
-          <div>Fecha: {dicomHeaderInfo.fechaEstudio}</div>
+          <div>Médico: {dicomHeaderInfo.medicoNombre}</div>
+          <div>Hospital: {dicomHeaderInfo.hospitalEstudio}</div>
+          <div>Fecha: {formatDicomDate(dicomHeaderInfo.fechaEstudio)}</div>
           <div>Modalidad: {dicomHeaderInfo.modalidad}</div>
-          <div>Series: {dicomHeaderInfo.numeroSerie}</div>
+          <div>Orientación: {getImageOrientation(dicomHeaderInfo.orientacionImagen)}</div>
           <div>Instancia: {dicomHeaderInfo.numeroInstancia}</div>
         </div>
       )}

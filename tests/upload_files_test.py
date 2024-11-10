@@ -5,8 +5,7 @@ class TestCargaArchivosDICOM(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Configurar el endpoint que usaremos en todas las pruebas
-        cls.api_endpoint = "http://localhost:3000/upload"  # Cambia la URL según tu configuración
+        cls.api_endpoint = "http://localhost:3000/upload"
         cls.archivos_dicom_validos = [
             "../../DATOS_DICOM/BSSFP/IMG-0002-00001.dcm",
             "../../DATOS_DICOM/BSSFP/IMG-0002-00002.dcm",
@@ -49,7 +48,7 @@ class TestCargaArchivosDICOM(unittest.TestCase):
         """
         Simular la carga de un archivo no valido
         """
-        # Simula la carga de un archivo no válido (PDF)
+        # Simula la carga de un archivo no válido
         for archivo in self.archivos_no_validos:
             with self.subTest(archivo=archivo):
                 with open(archivo, "rb") as archivo_no_valido:
