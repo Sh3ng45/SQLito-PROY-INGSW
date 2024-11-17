@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@cornerstonejs/core": "^2.1.20",
+    "@cornerstonejs/tools": "^2.1.20"
+  }
+}

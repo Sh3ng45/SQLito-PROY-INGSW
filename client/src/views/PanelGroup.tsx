@@ -229,14 +229,7 @@ const PanelGroup: React.FC<PanelGroupProps> = ({ columns, rows }) => {
               <Select
                 value={selectedImageSets[i] ? { value: selectedImageSets[i], label: selectedImageSets[i].toString() } : null}
                 styles={{ container: (provided) => ({ ...provided, width: '100%', margin: 0, padding: 0 }) }}
-                options={Object.keys(imgSets)
-                  .filter((key) => imgs[parseInt(key, 10)]?.length > 0)
-                  .flatMap((key) =>
-                    imgs[parseInt(key, 10)].map((img) => ({
-                      value: parseInt(key, 10),
-                      label: `Paciente: ${img.patientName}, Serie: ${img.seriesDescription}, Modalidad: ${img.modality}, Fecha: ${img.studyDate}`,
-                    }))
-                  )}
+                options={getFilteredOptions()}
                 onChange={(selected) => {
                   setSelectedImageSets((prev) => {
                     const newSelectedSets = [...prev];

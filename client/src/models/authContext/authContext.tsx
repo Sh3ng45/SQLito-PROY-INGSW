@@ -37,115 +37,91 @@ export const useAuth = () => {
   return context;
 };
 
+const validateUserResponse = (data: unknown): IUser | null => {
+  if (typeof data !== 'object' || data === null) return null;
+  if (!('username' in data) || typeof data.username !== 'string') return null;
+
+  return { username: data.username };
+};
+
+const handleError = (status: number | null, message?: string): string | null => {
+  if (!status) return message || 'Unknown error';
+  const errors: Record<number, string> = {
+    401: 'Unauthorized',
+    403: 'Forbidden',
+    404: 'Not Found',
+    500: 'Internal Server Error',
+  };
+  return errors[status] || 'Unknown Error';
+};
+
 export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const authURL = (import.meta.env.VITE_API_URL as string | undefined) ?? '';
   const [user, setUser] = useState<IUser | null>(null);
-
   const [token, setToken] = useLocalStorage<string | null>('token', null);
-
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!user);
 
   useEffect(() => {
     setIsAuthenticated(!!user && !!token);
   }, [user, token]);
 
+  const fetchUser = async () => {
+    if (!token) return null;
+    try {
+      const response = await axios.get(`${authURL}/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return validateUserResponse(response.data);
+    } catch {
+      return null;
+    }
+  };
+
   const queryResponse = useQuery({
     queryKey: ['user'],
-    queryFn: async () => {
-      if (!token) return null;
-
-      const response = await axios.get(`${authURL}/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data: unknown = response.data;
-
-      if (typeof data !== 'object' || data === null) return null;
-      if (!('username' in data) || typeof data.username !== 'string') return null;
-
-      const result: IUser = {
-        username: data.username,
-      };
-      return result;
-    },
+    queryFn: fetchUser,
     enabled: !!token,
     refetchInterval: 1000,
   });
 
   useEffect(() => {
-    if (!queryResponse.data) {
-      setUser(null);
-      return;
-    }
-
-    setUser({ username: queryResponse.data.username });
+    setUser(queryResponse.data || null);
   }, [queryResponse.data]);
 
   const authQuery = useCallback(
     async (path: string, username: string, password: string) => {
       try {
-        const response = await axios.post(`${authURL}${path}`, {
-          username,
-          password,
-        });
-        if (response.status >= 300 || response.status < 200) {
-          switch (response.status) {
-            case 401:
-              return 'Unauthorized';
-            case 403:
-              return 'Forbidden';
-            case 404:
-              return 'Not Found';
-            case 500:
-              return 'Internal Server Error';
-            default:
-              return 'Unknown Error';
-          }
+        const response = await axios.post(`${authURL}${path}`, { username, password });
+        const { status, data } = response;
+
+        if (status < 200 || status >= 300) {
+          return handleError(status);
         }
-        const data: unknown = response.data;
 
-        if (typeof data !== 'object' || data === null) return 'Invalid response';
+        if (!data || typeof data !== 'object' || !('token' in data)) {
+          return 'Invalid response';
+        }
 
-        if (!('token' in data) || !data.token) return 'Invalid token';
         const responseToken = data.token;
-
         if (typeof responseToken !== 'string') return 'Invalid token type';
-        setToken(responseToken);
 
+        setToken(responseToken);
         return null;
       } catch (error: unknown) {
-        if (error instanceof Error) {
-          const message = error.message;
-          if (message.includes('401')) {
-            return 'Unauthorized';
-          } else if (message.includes('403')) {
-            return 'Forbidden';
-          } else if (message.includes('404')) {
-            return 'Not Found';
-          }
-          return message;
-        } else if (typeof error === 'string') {
-          return error;
-        } else {
-          return 'Unknown error';
-        }
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return handleError(null, message);
       }
     },
-    [setToken, authURL],
+    [authURL, setToken],
   );
 
   const login = useCallback(
-    (username: string, password: string) => {
-      return authQuery('/login', username, password);
-    },
+    (username: string, password: string) => authQuery('/login', username, password),
     [authQuery],
   );
 
   const register = useCallback(
-    (username: string, password: string) => {
-      return authQuery('/register', username, password);
-    },
+    (username: string, password: string) => authQuery('/register', username, password),
     [authQuery],
   );
 
